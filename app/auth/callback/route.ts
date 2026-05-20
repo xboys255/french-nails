@@ -10,6 +10,12 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.user) {
+      // Honour ?next= param passed through state (e.g. from /book redirect)
+      const next = searchParams.get('next')
+      if (next && next.startsWith('/')) {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+
       // Redirect based on role
       const { data: profile } = await supabase
         .from('profiles')

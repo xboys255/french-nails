@@ -1,19 +1,27 @@
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import BookingWizard from '@/components/booking/BookingWizard'
+import PhoneGate from '@/components/booking/PhoneGate'
 import Navbar from '@/components/shared/Navbar'
 import { getLocale } from 'next-intl/server'
+import { redirect } from 'next/navigation'
 
 export default async function BookPage() {
   const locale = await getLocale()
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  let profile = null
-  if (user) {
-    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-    profile = data
+
+  // Must be signed in to book
+  if (!user) {
+    redirect(`/${locale}/auth/login?next=/${locale}/book`)
   }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
 
   const { data: services } = await supabase
     .from('services')
@@ -29,15 +37,28 @@ export default async function BookPage() {
     .select('*, profile:profiles(*), availability:staff_availability(*)')
     .eq('is_active', true)
 
+  const needsPhone = !profile?.phone
+
   return (
     <div className="min-h-screen bg-stone-50">
       <Navbar role={profile?.role ?? null} userName={profile?.full_name ?? null} />
-      <BookingWizard
-        services={services ?? []}
-        staffList={staffList ?? []}
-        profile={profile}
-        locale={locale}
-      />
+
+      {needsPhone ? (
+        // Collect phone number before allowing booking
+        <PhoneGate
+          profile={profile!}
+          services={services ?? []}
+          staffList={staffList ?? []}
+          locale={locale}
+        />
+      ) : (
+        <BookingWizard
+          services={services ?? []}
+          staffList={staffList ?? []}
+          profile={profile}
+          locale={locale}
+        />
+      )}
     </div>
   )
 }

@@ -62,6 +62,13 @@ function LoginContent() {
   const e164 = toE164(phone)
 
   async function redirectByRole(userId: string) {
+    // Honour ?next= param (e.g. redirected from /book)
+    const next = searchParams.get('next')
+    if (next && next.startsWith('/')) {
+      router.push(next)
+      router.refresh()
+      return
+    }
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', userId).single()
     const role = profile?.role ?? 'client'
     if (role === 'admin') router.push(`/${locale}/admin`)
