@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Elements, PaymentElement, PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import type { StripePaymentRequest } from '@stripe/stripe-js'
+import type { PaymentRequest } from '@stripe/stripe-js'
 import type { BookingState } from './BookingWizard'
 import type { Profile } from '@/types'
 import { Input } from '@/components/ui/input'
@@ -28,7 +28,7 @@ function PaymentForm({ onSuccess, clientSecret, deposit }: { onSuccess: () => vo
   const elements = useElements()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null)
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null)
 
   useEffect(() => {
     if (!stripe) return
