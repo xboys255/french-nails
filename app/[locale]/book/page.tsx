@@ -29,24 +29,30 @@ export default async function BookPage() {
     .eq('is_active', true)
     .order('category_id')
 
-  // Use service client so the profiles join works for anonymous visitors
-  // (the anon role cannot read other users' profiles due to RLS)
+  // Use service client so the profiles join bypasses RLS
+  // (the anon role cannot read other users' profiles)
   const admin = createServiceClient()
   const { data: staffList } = await admin
     .from('staff')
     .select('*, profile:profiles(*), availability:staff_availability(*)')
     .eq('is_active', true)
 
-  const needsPhone = !profile?.phone
+  // Guard: profile should always exist for authenticated users (created by DB trigger),
+  // but redirect defensively if the trigger hasn't run yet.
+  if (!profile) {
+    redirect(`/${locale}/auth/login`)
+  }
+
+  const needsPhone = !profile.phone
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Navbar role={profile?.role ?? null} userName={profile?.full_name ?? null} />
+      <Navbar role={profile.role ?? null} userName={profile.full_name ?? null} />
 
       {needsPhone ? (
-        // Collect phone number before allowing booking
+        // Collect phone number before showing the booking wizard
         <PhoneGate
-          profile={profile!}
+          profile={profile}
           services={services ?? []}
           staffList={staffList ?? []}
           locale={locale}
