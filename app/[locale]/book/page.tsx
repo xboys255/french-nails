@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import BookingWizard from '@/components/booking/BookingWizard'
 import Navbar from '@/components/shared/Navbar'
 import { getLocale } from 'next-intl/server'
@@ -20,7 +21,10 @@ export default async function BookPage() {
     .eq('is_active', true)
     .order('category_id')
 
-  const { data: staffList } = await supabase
+  // Use service client so the profiles join works for anonymous visitors
+  // (the anon role cannot read other users' profiles due to RLS)
+  const admin = createServiceClient()
+  const { data: staffList } = await admin
     .from('staff')
     .select('*, profile:profiles(*), availability:staff_availability(*)')
     .eq('is_active', true)

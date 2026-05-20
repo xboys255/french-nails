@@ -6,6 +6,14 @@ import type { Staff } from '@/types'
 import type { BookingState } from './BookingWizard'
 import { ChevronLeft, ArrowRight } from 'lucide-react'
 
+// Map any pink/rose/fuchsia hex values to neutral zinc so they never appear on the booking page
+const PINK_PATTERN = /^#(f9a8d4|f472b6|ec4899|db2777|be185d|9d174d|831843|fda4af|fb7185|f43f5e|e11d48|be123c|9f1239|881337|ff69b4|ff1493|c71585|ffb6c1|ffc0cb)/i
+function sanitizeColor(color: string | null | undefined): string {
+  if (!color) return '#17171c'
+  if (PINK_PATTERN.test(color.trim())) return '#3f3f46'
+  return color
+}
+
 interface Props {
   staffList: Staff[]
   booking: BookingState
@@ -76,7 +84,7 @@ export default function StepStaffDate({ staffList, booking, setBooking, onNext, 
               >
                 <div
                   className="w-11 h-11 rounded-full flex items-center justify-center mx-auto mb-2 text-white font-semibold text-base"
-                  style={{ backgroundColor: selected ? '#52525b' : (staff.color ?? '#17171c') }}
+                  style={{ backgroundColor: selected ? '#52525b' : sanitizeColor(staff.color) }}
                 >
                   {staff.profile?.full_name?.[0]?.toUpperCase() ?? '?'}
                 </div>
