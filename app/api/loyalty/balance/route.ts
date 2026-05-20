@@ -1,0 +1,16 @@
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+
+export async function GET() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { data: loyalty } = await supabase
+    .from('loyalty_accounts')
+    .select('points')
+    .eq('client_id', user.id)
+    .single()
+
+  return NextResponse.json({ points: loyalty?.points ?? 0 })
+}
