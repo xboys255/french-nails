@@ -45,7 +45,11 @@ function LoginContent() {
   const [otp, setOtp] = useState('')
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<'google' | 'apple' | null>(null)
-  const [error, setError] = useState(searchParams.get('error') === 'oauth' ? 'OAuth sign-in failed. Please try again.' : '')
+  const [error, setError] = useState(() => {
+    if (searchParams.get('error') !== 'oauth') return ''
+    const msg = searchParams.get('msg')
+    return msg ? decodeURIComponent(msg) : 'Google sign-in failed. Please try again.'
+  })
 
   // Restore remembered email
   useEffect(() => {
