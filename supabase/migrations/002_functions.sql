@@ -55,8 +55,9 @@ begin
   insert into public.profiles (id, full_name, phone, email, role)
   values (
     new.id,
-    coalesce(new.raw_user_meta_data->>'full_name', 'New User'),
-    coalesce(new.phone, new.raw_user_meta_data->>'phone', ''),
+    coalesce(new.raw_user_meta_data->>'full_name', ''),
+    -- NULLIF converts '' → NULL so multiple OAuth/email users don't collide on UNIQUE(phone)
+    nullif(coalesce(new.phone, new.raw_user_meta_data->>'phone', ''), ''),
     new.email,
     'client'
   )

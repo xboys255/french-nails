@@ -7,7 +7,7 @@ create extension if not exists "uuid-ossp";
 create table public.profiles (
   id uuid references auth.users on delete cascade primary key,
   full_name text not null,
-  phone text not null unique,
+  phone text unique,
   email text,
   role text not null default 'client' check (role in ('client', 'staff', 'admin')),
   avatar_url text,
