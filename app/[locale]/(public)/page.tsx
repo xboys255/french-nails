@@ -1,9 +1,47 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { getLocale } from 'next-intl/server'
 import { ArrowRight } from 'lucide-react'
 import Navbar from '@/components/shared/Navbar'
 import { LogoMark } from '@/components/shared/Logo'
 import { createClient } from '@/lib/supabase/server'
+
+// Curated Unsplash nail-art & beauty photos
+const HERO_IMG =
+  'https://images.unsplash.com/photo-1604902396830-aca29e19b067?w=900&q=85&fit=crop'
+
+const GALLERY = [
+  {
+    src: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80&fit=crop',
+    alt: 'Elegant gel nail art with floral design',
+    span: 'row-span-2',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1604902397576-ea5ebe6fa8da?w=600&q=80&fit=crop',
+    alt: 'French manicure close-up',
+    span: '',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1604902396950-3b7c1ba8e714?w=600&q=80&fit=crop',
+    alt: 'Nude almond shaped nails',
+    span: '',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80&fit=crop',
+    alt: 'Nail salon ambient lighting',
+    span: '',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1600428877878-1a0fd85beda8?w=600&q=80&fit=crop',
+    alt: 'Artistic nail design with gems',
+    span: '',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1604654894559-1a2aa0b6d1b0?w=600&q=80&fit=crop',
+    alt: 'Classic red manicure',
+    span: '',
+  },
+]
 
 export default async function HomePage() {
   const locale = await getLocale()
@@ -63,18 +101,22 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right: media card */}
+            {/* Right: hero photo card */}
             <div className="relative flex justify-center lg:justify-end">
               <div className="relative w-full max-w-sm lg:max-w-full">
-                {/* Main card */}
-                <div className="bg-stone-100 rounded-[22px] aspect-[3/4] w-full relative overflow-hidden">
-                  {/* Background gem watermark */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <LogoMark className="w-28 h-36 text-stone-300" color="#d4cfc8" />
-                  </div>
 
-                  {/* Ambient gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-200/60 to-transparent" />
+                {/* Main photo card */}
+                <div className="rounded-[22px] aspect-[3/4] w-full relative overflow-hidden shadow-xl">
+                  <Image
+                    src={HERO_IMG}
+                    alt="Beautiful nail art by French Nails studio"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                    priority
+                  />
+                  {/* Dark gradient so the floating panel reads clearly */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
                   {/* Floating availability panel */}
                   <div className="absolute bottom-5 left-5 right-5 bg-zinc-900/95 backdrop-blur-sm rounded-[14px] p-5">
@@ -168,6 +210,52 @@ export default async function HomePage() {
                 </div>
                 <h3 className="text-lg font-medium text-zinc-900 mb-3">{f.title}</h3>
                 <p className="text-sm text-zinc-500 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Our Work Gallery ── */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-7xl">
+
+          {/* Section header */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
+            <div>
+              <div className="text-[10px] tracking-[0.2em] uppercase text-zinc-400 mb-5">Portfolio</div>
+              <h2
+                className="text-[clamp(2rem,5vw,3.5rem)] font-light tracking-tight leading-tight text-zinc-900"
+                style={{ fontFamily: "var(--font-cormorant), Georgia, serif" }}
+              >
+                Our work,<br />
+                <em>your inspiration.</em>
+              </h2>
+            </div>
+            <Link
+              href={`/${locale}/book`}
+              className="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-zinc-500 hover:text-zinc-900 underline underline-offset-4 transition-colors self-start md:self-auto"
+            >
+              Book your look <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+
+          {/* Mosaic grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 auto-rows-[220px] md:auto-rows-[260px] gap-3 md:gap-4">
+            {GALLERY.map((photo, i) => (
+              <div
+                key={i}
+                className={`relative rounded-2xl overflow-hidden group ${photo.span}`}
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500" />
               </div>
             ))}
           </div>
