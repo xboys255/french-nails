@@ -69,7 +69,7 @@ function PaymentForm({ onSuccess, clientSecret, deposit }: { onSuccess: () => vo
           <PaymentRequestButtonElement
             options={{
               paymentRequest,
-              style: { paymentRequestButton: { theme: 'dark', height: '48px', borderRadius: '999px' } },
+              style: { paymentRequestButton: { theme: 'dark', height: '48px' } },
             }}
           />
           <div className="flex items-center gap-3">
